@@ -11,9 +11,40 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+
+const registerSchema = z.object({
+  name: z.string(),
+  email: z.string().email({ message: 'Dado inválido, insira um e-mail' }),
+  password: z
+    .string()
+    .min(10, {
+      message: 'Tamanho mínimo de 10 caracteres',
+    })
+    .max(25, {
+      message: 'Tamanho máximo de 25 caracteres',
+    }),
+})
 
 export default function RegisterPage() {
-  const form = useForm()
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  })
+
+  function onSubmit(
+    values: z.infer<typeof registerSchema>,
+    e?: React.BaseSyntheticEvent,
+  ) {
+    e?.preventDefault()
+
+    console.log(values)
+  }
 
   return (
     <div className="bg-slate-950 h-screen flex justify-center items-center flex-col gap-">
@@ -23,7 +54,10 @@ export default function RegisterPage() {
       </span>
 
       <Form {...form}>
-        <form className="flex flex-col gap-3 mt-5 w-[25vw]">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-3 mt-5 w-[70vw] md:w-[25vw]"
+        >
           <FormField
             control={form.control}
             name="name"
@@ -34,6 +68,7 @@ export default function RegisterPage() {
                 </FormLabel>
                 <FormControl>
                   <Input
+                    type="text"
                     placeholder="Seu nome completo"
                     className="bg-slate-700 text-slate-100"
                     {...field}
@@ -54,6 +89,7 @@ export default function RegisterPage() {
                 </FormLabel>
                 <FormControl>
                   <Input
+                    type="email"
                     placeholder="jhondoe@email.com"
                     className="bg-slate-700 text-slate-100"
                     {...field}
@@ -74,6 +110,7 @@ export default function RegisterPage() {
                 </FormLabel>
                 <FormControl>
                   <Input
+                    type="password"
                     placeholder="Insira sua senha"
                     className="bg-slate-700 text-slate-100"
                     {...field}
@@ -84,7 +121,9 @@ export default function RegisterPage() {
             )}
           />
 
-          <Button className="mt-2 font-semibold">Cadastrar</Button>
+          <Button type="submit" className="mt-2 font-semibold">
+            Cadastrar
+          </Button>
         </form>
       </Form>
     </div>
