@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/axios'
 
 const registerSchema = z.object({
   name: z.string(),
@@ -37,13 +39,30 @@ export default function RegisterPage() {
     },
   })
 
-  function onSubmit(
-    values: z.infer<typeof registerSchema>,
+  const { toast } = useToast()
+
+  async function onSubmit(
+    { name, email, password }: z.infer<typeof registerSchema>,
     e?: React.BaseSyntheticEvent,
   ) {
     e?.preventDefault()
 
-    console.log(values)
+    api
+      .post('/accounts', { name, email, password })
+      .then(() => {
+        toast({
+          title: 'Cadastro realizado',
+          description: 'Contacte um administrador para aprovar seu cadastro',
+        })
+      })
+      .catch((error) => {
+        if (error.response.status === 409) {
+          toast({
+            title: 'Usuário já existe',
+            variant: 'destructive',
+          })
+        }
+      })
   }
 
   return (
