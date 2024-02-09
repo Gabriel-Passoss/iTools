@@ -31,16 +31,36 @@ export interface Instance {
   updatedAt: string
 }
 
-export interface Root {
+export interface FetchInstancesResponse {
   instances: Instance[]
 }
 
+export interface CreateInstanceResponse {
+  instance: Instance
+  base64: string
+}
+
 async function getInstances() {
-  const { data } = await api.get<Root>('/instances')
+  const { data } = await api.get<FetchInstancesResponse>('/instances')
 
   return data
 }
 
 export function useFetchInstances() {
   return useSwr('instances', getInstances)
+}
+
+export async function deleteInstance(name: string) {
+  const { status } = await api.delete(`/instances/${name}`)
+
+  return { status }
+}
+
+export async function createInstance(name: string, phone: string) {
+  const { status, data } = await api.post<CreateInstanceResponse>(
+    '/instances',
+    { name, phone },
+  )
+
+  return { data, status }
 }
