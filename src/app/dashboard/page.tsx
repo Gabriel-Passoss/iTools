@@ -3,12 +3,14 @@
 import { LineCart } from '@/components/line-cart'
 import { PizzaCart } from '@/components/pizza-cart'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { useFetchInstances } from '@/queries/instance'
+import { InstanceHeat, useFetchInstances } from '@/queries/instance'
 import { Ban, Check, Flame, Send } from 'lucide-react'
 import Link from 'next/link'
 
 export default function DashboardPage() {
   const { data } = useFetchInstances()
+
+  console.log(data?.instances)
 
   return (
     <div className="h-screen flex flex-col gap-5 bg-slate-950">
@@ -47,15 +49,26 @@ export default function DashboardPage() {
               Instâncias ativas
               <Check size={16} />
             </h2>
-            <span className="text-slate-200 font-bold text-2xl">10</span>
+            <span className="text-slate-200 font-bold text-2xl">
+              {
+                data?.instances.filter((instance) => instance.status === 'OPEN')
+                  .length
+              }
+            </span>
           </div>
 
           <div className="w-[17vw] h-[11vh] border-[1px] border-slate-800 rounded-md py-3 px-5 flex flex-col justify-center gap-2">
             <h2 className="text-slate-200 flex justify-between items-center">
-              Instâncias bloqueadas
+              Instâncias inativas
               <Ban size={16} />
             </h2>
-            <span className="text-slate-200 font-bold text-2xl">10</span>
+            <span className="text-slate-200 font-bold text-2xl">
+              {
+                data?.instances.filter(
+                  (instance) => instance.status === 'CLOSE',
+                ).length
+              }
+            </span>
           </div>
 
           <div className="w-[17vw] h-[11vh] border-[1px] border-slate-800 rounded-md py-3 px-5 flex flex-col justify-center gap-2">
@@ -63,7 +76,28 @@ export default function DashboardPage() {
               Instâncias aquecendo
               <Flame size={16} />
             </h2>
-            <span className="text-slate-200 font-bold text-2xl">58</span>
+            <span className="text-slate-200 font-bold text-2xl">
+              {
+                data?.instances.filter(
+                  (instance) =>
+                    instance.heat !== InstanceHeat.FALSE && InstanceHeat.TRUE,
+                ).length
+              }
+            </span>
+          </div>
+
+          <div className="w-[17vw] h-[11vh] border-[1px] border-slate-800 rounded-md py-3 px-5 flex flex-col justify-center gap-2">
+            <h2 className="text-slate-200 flex justify-between items-center">
+              Instâncias aquecidas
+              <Flame size={16} />
+            </h2>
+            <span className="text-slate-200 font-bold text-2xl">
+              {
+                data?.instances.filter(
+                  (instance) => instance.heat === InstanceHeat.TRUE,
+                ).length
+              }
+            </span>
           </div>
 
           <div className="w-[17vw] h-[11vh] border-[1px] border-slate-800 rounded-md py-3 px-5 flex flex-col justify-center gap-2">
