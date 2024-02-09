@@ -1,10 +1,15 @@
+'use client'
+
 import { LineCart } from '@/components/line-cart'
 import { PizzaCart } from '@/components/pizza-cart'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { useFetchInstances } from '@/queries/instance'
 import { Ban, Check, Flame, Send } from 'lucide-react'
 import Link from 'next/link'
 
 export default function DashboardPage() {
+  const { data } = useFetchInstances()
+
   return (
     <div className="h-screen flex flex-col gap-5 bg-slate-950">
       <header>
