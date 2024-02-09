@@ -17,7 +17,7 @@ export default function InAppLayout({ children }: { children: ReactNode }) {
                 <Link href="/dashboard">Dashboard</Link>
               </li>
               <li className="hover:text-slate-300 transition-colors duration-300">
-                <Link href="/heating">Instâncias</Link>
+                <Link href="/instances">Instâncias</Link>
               </li>
             </ul>
           </div>
