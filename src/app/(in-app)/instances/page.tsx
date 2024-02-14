@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import {
   CreateInstanceResponse,
+  Instance,
   deleteInstance,
   useFetchInstances,
 } from '@/queries/instance'
@@ -27,7 +28,7 @@ import {
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { useSWRConfig } from 'swr'
 import { InstancesTable } from '@/components/instances-table'
@@ -82,9 +83,10 @@ export default function InstancesPage() {
   const { data } = useFetchInstances()
   const { mutate } = useSWRConfig()
   const { toast } = useToast()
-  const instances = data?.instances
+  const [instances, setInstances] = useState<Instance[] | undefined>([])
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [filter, setFilter] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [qrCode, setQrCode] = useState<string | null>(null)
 
@@ -99,6 +101,10 @@ export default function InstancesPage() {
     },
   })
 
+  useEffect(() => {
+    setInstances(data?.instances)
+  }, [data])
+
   async function handleDeleteInstance(name: string) {
     const { status } = await deleteInstance(name)
 
@@ -109,7 +115,7 @@ export default function InstancesPage() {
     }
   }
 
-  async function onSubmit(
+  async function handleCreateInstance(
     { name, phone, heat }: z.infer<typeof createInstanceSchema>,
     e?: React.BaseSyntheticEvent,
   ) {
@@ -144,6 +150,10 @@ export default function InstancesPage() {
     form.reset()
   }
 
+  const filterInstances = instances?.filter((instance) =>
+    instance.name.toLowerCase().includes(filter.toLowerCase()),
+  )
+
   return (
     <section className="p-14 flex flex-col">
       <h1 className="text-4xl font-bold text-slate-200">Instâncias</h1>
@@ -153,6 +163,7 @@ export default function InstancesPage() {
           type="text"
           placeholder="Filtrar instância"
           className="p-5 bg-slate-700 text-slate-100"
+          onChange={(event) => setFilter(event.target.value)}
         />
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
@@ -184,7 +195,7 @@ export default function InstancesPage() {
             ) : (
               <Form {...form}>
                 <form
-                  onSubmit={form.handleSubmit(onSubmit)}
+                  onSubmit={form.handleSubmit(handleCreateInstance)}
                   className="flex flex-col gap-3 mt-5 w-[70vw] md:w-[25vw]"
                 >
                   <FormField
@@ -275,7 +286,7 @@ export default function InstancesPage() {
 
       <div className="px-14">
         <InstancesTable
-          instances={instances}
+          instances={filterInstances}
           handleDeleteInstance={handleDeleteInstance}
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
