@@ -1,8 +1,21 @@
+import { nextAuthOptions } from '@/app/api/auth/[...nextauth]/route'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { getServerSession } from 'next-auth'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
 
-export default function InAppLayout({ children }: { children: ReactNode }) {
+export default async function InAppLayout({
+  children,
+}: {
+  children: ReactNode
+}) {
+  const session = await getServerSession(nextAuthOptions)
+
+  if (!session) {
+    redirect('/login')
+  }
+
   return (
     <div className="h-screen flex flex-col gap-5 bg-slate-950">
       <header>

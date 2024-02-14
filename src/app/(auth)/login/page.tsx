@@ -10,9 +10,9 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { AuthContext } from '@/contexts/AuthContext'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useContext } from 'react'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -29,8 +29,6 @@ const loginSchema = z.object({
 })
 
 export default function LoginPage() {
-  const { signIn } = useContext(AuthContext)
-
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -39,13 +37,25 @@ export default function LoginPage() {
     },
   })
 
+  const router = useRouter()
+
   async function onSubmit(
     { email, password }: z.infer<typeof loginSchema>,
     e?: React.BaseSyntheticEvent,
   ) {
     e?.preventDefault()
 
-    await signIn({ email, password })
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    })
+
+    if (result?.error) {
+      return null
+    }
+
+    router.replace('/dashboard')
   }
 
   return (

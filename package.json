@@ -25,6 +25,7 @@
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.323.0",
     "next": "14.1.0",
+    "next-auth": "^4.24.6",
     "nookies": "^2.5.2",
     "react": "^18",
     "react-dom": "^18",
