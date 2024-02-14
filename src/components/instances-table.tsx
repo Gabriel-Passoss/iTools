@@ -93,7 +93,7 @@ export function InstancesTable({
     <Table>
       <TableCaption>Listagem de instâncias criadas</TableCaption>
       <TableHeader>
-        <TableRow className="border-slate-700">
+        <TableRow className="border-slate-700 hover:bg-slate-800">
           <TableHead className="">Nome</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Número conectado</TableHead>

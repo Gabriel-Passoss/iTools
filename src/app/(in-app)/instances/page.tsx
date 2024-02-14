@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import {
-  createInstance,
+  CreateInstanceResponse,
   deleteInstance,
   useFetchInstances,
 } from '@/queries/instance'
@@ -32,6 +32,8 @@ import { useToast } from '@/components/ui/use-toast'
 import { useSWRConfig } from 'swr'
 import { InstancesTable } from '@/components/instances-table'
 import { Switch } from '@/components/ui/switch'
+import { api } from '@/lib/axios'
+import { AxiosError } from 'axios'
 
 const createInstanceSchema = z.object({
   name: z.string(),
@@ -72,17 +74,32 @@ export default function InstancesPage() {
     { name, phone, heat }: z.infer<typeof createInstanceSchema>,
     e?: React.BaseSyntheticEvent,
   ) {
-    setIsLoading(true)
     e?.preventDefault()
+    setIsLoading(true)
 
-    const { status, data } = await createInstance(name, phone, heat)
-    setQrCode(data.base64)
+    api
+      .post<CreateInstanceResponse>('/instances', { name, phone, heat })
+      .then((response) => {
+        setQrCode(response.data.base64)
+        mutate('instances')
+      })
+      .catch((error) => {
+        if (error instanceof AxiosError) {
+          console.log(error)
+          if (error.response?.status === 201) {
+            toast({ title: 'Instância criada com sucesso!' })
+          }
 
-    mutate('instances')
+          if (error.response?.status === 409) {
+            setIsCreateDialogOpen(false)
+            toast({
+              title: `Instancia com o mesmo nome ou telefone já existe`,
+              variant: 'destructive',
+            })
+          }
+        }
+      })
 
-    if (status === 201) {
-      toast({ title: 'Instância criada com sucesso!' })
-    }
     setIsLoading(false)
     form.reset()
   }

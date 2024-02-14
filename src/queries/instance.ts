@@ -55,16 +55,3 @@ export async function deleteInstance(name: string) {
 
   return { status }
 }
-
-export async function createInstance(
-  name: string,
-  phone: string,
-  heat: boolean,
-) {
-  const { status, data } = await api.post<CreateInstanceResponse>(
-    '/instances',
-    { name, phone, heat },
-  )
-
-  return { data, status }
-}
