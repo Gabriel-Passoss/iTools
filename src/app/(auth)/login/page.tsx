@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useToast } from '@/components/ui/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -29,6 +30,9 @@ const loginSchema = z.object({
 })
 
 export default function LoginPage() {
+  const { toast } = useToast()
+  const router = useRouter()
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -36,8 +40,6 @@ export default function LoginPage() {
       password: '',
     },
   })
-
-  const router = useRouter()
 
   async function onSubmit(
     { email, password }: z.infer<typeof loginSchema>,
@@ -52,10 +54,15 @@ export default function LoginPage() {
     })
 
     if (result?.error) {
-      return null
+      toast({
+        title: 'Credenciais invalidas, tente novamente',
+        variant: 'destructive',
+      })
     }
 
-    router.replace('/dashboard')
+    if (result?.ok) {
+      router.replace('/dashboard')
+    }
   }
 
   return (
