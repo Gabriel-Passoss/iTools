@@ -18,6 +18,7 @@ import { Loader2 } from 'lucide-react'
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -30,10 +31,12 @@ import { useState } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { useSWRConfig } from 'swr'
 import { InstancesTable } from '@/components/instances-table'
+import { Switch } from '@/components/ui/switch'
 
 const createInstanceSchema = z.object({
   name: z.string(),
   phone: z.string().min(13).max(13),
+  heat: z.boolean(),
 })
 
 export default function InstancesPage() {
@@ -51,6 +54,7 @@ export default function InstancesPage() {
     defaultValues: {
       name: '',
       phone: '55',
+      heat: true,
     },
   })
 
@@ -65,13 +69,13 @@ export default function InstancesPage() {
   }
 
   async function onSubmit(
-    { name, phone }: z.infer<typeof createInstanceSchema>,
+    { name, phone, heat }: z.infer<typeof createInstanceSchema>,
     e?: React.BaseSyntheticEvent,
   ) {
     setIsLoading(true)
     e?.preventDefault()
 
-    const { status, data } = await createInstance(name, phone)
+    const { status, data } = await createInstance(name, phone, heat)
     setQrCode(data.base64)
 
     mutate('instances')
@@ -168,6 +172,29 @@ export default function InstancesPage() {
                     )}
                   />
 
+                  <FormField
+                    control={form.control}
+                    name="heat"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-slate-700 p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-slate-200">
+                            Aquecimento
+                          </FormLabel>
+                          <FormDescription className="text-slate-200">
+                            Adicionar à esteira de aquecimento de chips
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className="bg-green-500"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
                   <Button
                     type="submit"
                     className="bg-green-600 hover:bg-green-700 mt-5"
