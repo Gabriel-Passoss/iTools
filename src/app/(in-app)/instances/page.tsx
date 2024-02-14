@@ -34,12 +34,49 @@ import { InstancesTable } from '@/components/instances-table'
 import { Switch } from '@/components/ui/switch'
 import { api } from '@/lib/axios'
 import { AxiosError } from 'axios'
+import type { MaskitoOptions } from '@maskito/core'
+import { useMaskito } from '@maskito/react'
 
 const createInstanceSchema = z.object({
   name: z.string(),
-  phone: z.string().min(13).max(13),
+  phone: z
+    .string()
+    .min(19)
+    .max(19)
+    .transform((value) =>
+      value
+        .replaceAll('+', '')
+        .replaceAll('(', '')
+        .replaceAll(')', '')
+        .replaceAll('-', '')
+        .replaceAll(' ', ''),
+    ),
   heat: z.boolean(),
 })
+
+const digitsOnlyMask: MaskitoOptions = {
+  mask: [
+    '+',
+    '5',
+    '5',
+    ' ',
+    '(',
+    /\d/,
+    /\d/,
+    ')',
+    ' ',
+    /\d/,
+    /\d/,
+    /\d/,
+    /\d/,
+    /\d/,
+    '-',
+    /\d/,
+    /\d/,
+    /\d/,
+    /\d/,
+  ],
+}
 
 export default function InstancesPage() {
   const { data } = useFetchInstances()
@@ -50,6 +87,8 @@ export default function InstancesPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [qrCode, setQrCode] = useState<string | null>(null)
+
+  const inputRef = useMaskito({ options: digitsOnlyMask })
 
   const form = useForm<z.infer<typeof createInstanceSchema>>({
     resolver: zodResolver(createInstanceSchema),
@@ -76,8 +115,9 @@ export default function InstancesPage() {
   ) {
     e?.preventDefault()
     setIsLoading(true)
+    console.log(phone)
 
-    api
+    await api
       .post<CreateInstanceResponse>('/instances', { name, phone, heat })
       .then((response) => {
         setQrCode(response.data.base64)
@@ -178,10 +218,14 @@ export default function InstancesPage() {
                         </FormLabel>
                         <FormControl>
                           <Input
+                            {...field}
                             type="tel"
                             placeholder="Celular"
                             className="bg-slate-700 text-slate-100"
-                            {...field}
+                            ref={inputRef}
+                            onInput={(event) => {
+                              form.setValue('phone', event.currentTarget.value)
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
