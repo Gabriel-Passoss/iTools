@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
 
   if (token) {
     if (request.nextUrl.pathname === '/') {
-      return NextResponse.redirect('/dashboard')
+      return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   } else if (!token) {
     if (request.nextUrl.pathname === '/dashboard') {
