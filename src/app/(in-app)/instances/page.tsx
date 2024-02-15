@@ -121,7 +121,6 @@ export default function InstancesPage() {
   ) {
     e?.preventDefault()
     setIsLoading(true)
-    console.log(phone)
 
     await api
       .post<CreateInstanceResponse>('/instances', { name, phone, heat })
@@ -131,7 +130,6 @@ export default function InstancesPage() {
       })
       .catch((error) => {
         if (error instanceof AxiosError) {
-          console.log(error)
           if (error.response?.status === 201) {
             toast({ title: 'Instância criada com sucesso!' })
           }

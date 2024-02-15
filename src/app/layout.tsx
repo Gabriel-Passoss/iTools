@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { AuthProvider } from '@/contexts/AuthContext'
 import { Toaster } from '@/components/ui/toaster'
+import { NextAuthSessionProvider } from '@/providers/session-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,11 +17,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="shortcut icon" href="/logo.png" />
+      </head>
       <body className={inter.className}>
-        <AuthProvider>
+        <NextAuthSessionProvider>
           <Toaster />
           {children}
-        </AuthProvider>
+        </NextAuthSessionProvider>
       </body>
     </html>
   )

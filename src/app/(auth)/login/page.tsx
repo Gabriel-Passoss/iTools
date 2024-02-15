@@ -10,9 +10,10 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { AuthContext } from '@/contexts/AuthContext'
+import { useToast } from '@/components/ui/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useContext } from 'react'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -29,7 +30,8 @@ const loginSchema = z.object({
 })
 
 export default function LoginPage() {
-  const { signIn } = useContext(AuthContext)
+  const { toast } = useToast()
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -45,7 +47,22 @@ export default function LoginPage() {
   ) {
     e?.preventDefault()
 
-    await signIn({ email, password })
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    })
+
+    if (result?.error) {
+      toast({
+        title: 'Credenciais invalidas, tente novamente',
+        variant: 'destructive',
+      })
+    }
+
+    if (result?.ok) {
+      router.replace('/dashboard')
+    }
   }
 
   return (

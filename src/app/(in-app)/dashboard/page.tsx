@@ -3,13 +3,11 @@
 import { LineCart } from '@/components/line-cart'
 import { PizzaCart } from '@/components/pizza-cart'
 
-import { InstanceHeat, useFetchInstances } from '@/queries/instance'
+import { Instance, InstanceHeat, useFetchInstances } from '@/queries/instance'
 import { Ban, Check, Flame, Send } from 'lucide-react'
 
 export default function DashboardPage() {
   const { data } = useFetchInstances()
-
-  console.log(data?.instances)
 
   return (
     <section className="p-14 flex flex-col gap-5">
@@ -22,8 +20,9 @@ export default function DashboardPage() {
           </h2>
           <span className="text-slate-200 font-bold text-2xl">
             {
-              data?.instances.filter((instance) => instance.status === 'OPEN')
-                .length
+              data?.instances.filter(
+                (instance: Instance) => instance.status === 'OPEN',
+              ).length
             }
           </span>
         </div>
@@ -35,8 +34,9 @@ export default function DashboardPage() {
           </h2>
           <span className="text-slate-200 font-bold text-2xl">
             {
-              data?.instances.filter((instance) => instance.status === 'CLOSE')
-                .length
+              data?.instances.filter(
+                (instance: Instance) => instance.status === 'CLOSE',
+              ).length
             }
           </span>
         </div>
@@ -49,7 +49,7 @@ export default function DashboardPage() {
           <span className="text-slate-200 font-bold text-2xl">
             {
               data?.instances.filter(
-                (instance) =>
+                (instance: Instance) =>
                   instance.heat !== InstanceHeat.FALSE && InstanceHeat.TRUE,
               ).length
             }
@@ -64,7 +64,7 @@ export default function DashboardPage() {
           <span className="text-slate-200 font-bold text-2xl">
             {
               data?.instances.filter(
-                (instance) => instance.heat === InstanceHeat.TRUE,
+                (instance: Instance) => instance.heat === InstanceHeat.TRUE,
               ).length
             }
           </span>

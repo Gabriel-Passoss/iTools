@@ -1,8 +1,22 @@
+import { nextAuthOptions } from '@/app/api/auth/[...nextauth]/route'
+import { LogoutButton } from '@/components/logout-button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { getServerSession } from 'next-auth'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
 
-export default function InAppLayout({ children }: { children: ReactNode }) {
+export default async function InAppLayout({
+  children,
+}: {
+  children: ReactNode
+}) {
+  const session = await getServerSession(nextAuthOptions)
+
+  if (!session) {
+    redirect('/login')
+  }
+
   return (
     <div className="h-screen flex flex-col gap-5 bg-slate-950">
       <header>
@@ -21,14 +35,16 @@ export default function InAppLayout({ children }: { children: ReactNode }) {
               </li>
             </ul>
           </div>
-
-          <Avatar>
-            <AvatarImage
-              src="https://github.com/Gabriel-Passoss.png"
-              alt="@shadcn"
-            />
-            <AvatarFallback>Avatar</AvatarFallback>
-          </Avatar>
+          <div className="flex items-center gap-5">
+            <Avatar>
+              <AvatarImage
+                src="https://github.com/Gabriel-Passoss.png"
+                alt="@shadcn"
+              />
+              <AvatarFallback>Avatar</AvatarFallback>
+            </Avatar>
+            <LogoutButton />
+          </div>
         </nav>
       </header>
 
