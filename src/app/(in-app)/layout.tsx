@@ -1,4 +1,4 @@
-import { nextAuthOptions } from '@/app/api/auth/[...nextauth]/route'
+import { nextAuthOptions } from '@/utils/next-auth-options'
 import { ProfileButton } from '@/components/profile-button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getServerSession } from 'next-auth'
