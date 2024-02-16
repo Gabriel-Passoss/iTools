@@ -98,8 +98,8 @@ export function ProfileButton({ userSession }: ProfileButtonProps) {
 
   const router = useRouter()
 
-  function handleSignOut() {
-    signOut({
+  async function handleSignOut() {
+    await signOut({
       redirect: false,
     })
 
@@ -318,66 +318,72 @@ export function ProfileButton({ userSession }: ProfileButtonProps) {
               <TableRow className="hover:bg-slate-900">
                 <TableHead>Usuário</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Cargo</TableHead>
                 <TableHead>Criado há</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="hover:bg-slate-900 transition-colors">
-              {data?.users.map((user) => {
-                return (
-                  <>
-                    <TableCell className="text-slate-200 text-nowrap flex items-center gap-2">
-                      <Avatar>
-                        <AvatarImage
-                          src="https://github.com/Gabriel-Passoss.png"
-                          className="h-7 w-7 rounded-full cursor-pointer"
-                        />
-                        <AvatarFallback>Avatar</AvatarFallback>
-                      </Avatar>
-                      {user.name}
-                    </TableCell>
-                    <TableCell className="text-slate-200 text-nowrap">
-                      {user.isActive ? 'Ativo' : 'Inativo'}
-                    </TableCell>
-                    <TableCell className="text-slate-200 text-nowrap">
-                      {formatDate(user.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      {user.id === userSession.id ? (
-                        <></>
-                      ) : (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger className="outline-none">
-                            <MoreVertical className="text-slate-200" />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            {user.isActive === false ? (
-                              <></>
-                            ) : (
-                              <DropdownMenuItem
-                                onClick={() => handleActiveUser(user.id)}
-                                className="cursor-pointer"
-                              >
-                                Ativar
-                              </DropdownMenuItem>
-                            )}
-
+            {data?.users.map((user) => {
+              return (
+                <TableBody
+                  className="hover:bg-slate-900 transition-colors"
+                  key={user.id}
+                >
+                  <TableCell className="text-slate-200 text-nowrap flex items-center gap-2">
+                    <Avatar>
+                      <AvatarImage
+                        src="https://github.com/Gabriel-Passoss.png"
+                        className="h-7 w-7 rounded-full cursor-pointer"
+                      />
+                      <AvatarFallback>Avatar</AvatarFallback>
+                    </Avatar>
+                    {user.name}
+                  </TableCell>
+                  <TableCell className="text-slate-200 text-nowrap">
+                    {user.isActive ? 'Ativo' : 'Inativo'}
+                  </TableCell>
+                  <TableCell className="text-slate-200 text-nowrap">
+                    {user.role === 'ADMIN' ? 'Administrador' : 'Usuário'}
+                  </TableCell>
+                  <TableCell className="text-slate-200 text-nowrap">
+                    {formatDate(user.createdAt)}
+                  </TableCell>
+                  <TableCell>
+                    {user.id === userSession.id ||
+                    userSession.role === 'USER' ? (
+                      <></>
+                    ) : (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="outline-none">
+                          <MoreVertical className="text-slate-200" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          {user.isActive ? (
+                            <></>
+                          ) : (
                             <DropdownMenuItem
-                              onClick={() => handleDeleteUser(user.id)}
+                              onClick={() => handleActiveUser(user.id)}
                               className="cursor-pointer"
                             >
-                              Deletar
+                              Ativar
                             </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                    </TableCell>
-                  </>
-                )
-              })}
-            </TableBody>
+                          )}
+
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="cursor-pointer"
+                          >
+                            Deletar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </TableCell>
+                </TableBody>
+              )
+            })}
           </Table>
         </DialogContent>
       )}
