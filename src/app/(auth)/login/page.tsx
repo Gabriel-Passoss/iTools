@@ -55,7 +55,7 @@ export default function LoginPage() {
 
     if (result?.error) {
       toast({
-        title: 'Credenciais invalidas, tente novamente',
+        title: 'Credenciais inválidas ou usuário não ativado',
         variant: 'destructive',
       })
     }
