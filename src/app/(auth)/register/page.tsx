@@ -15,6 +15,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/axios'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
 const registerSchema = z.object({
   name: z.string(),
@@ -30,6 +33,8 @@ const registerSchema = z.object({
 })
 
 export default function RegisterPage() {
+  const [isLoading, setIsLoading] = useState(false)
+
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -38,7 +43,7 @@ export default function RegisterPage() {
       password: '',
     },
   })
-
+  const router = useRouter()
   const { toast } = useToast()
 
   async function onSubmit(
@@ -47,15 +52,23 @@ export default function RegisterPage() {
   ) {
     e?.preventDefault()
 
+    setIsLoading(true)
+
     api
       .post('/accounts', { name, email, password })
       .then(() => {
+        setIsLoading(false)
         toast({
           title: 'Cadastro realizado',
           description: 'Contacte um administrador para aprovar seu cadastro',
         })
+
+        setTimeout(() => {
+          router.replace('/login')
+        }, 5000)
       })
       .catch((error) => {
+        setIsLoading(false)
         if (error.response.status === 409) {
           toast({
             title: 'Usuário já existe',
@@ -141,7 +154,7 @@ export default function RegisterPage() {
           />
 
           <Button type="submit" className="mt-2 font-semibold">
-            Cadastrar
+            {isLoading ? <Loader2 className="animate-spin" /> : 'Entrar'}
           </Button>
         </form>
       </Form>
