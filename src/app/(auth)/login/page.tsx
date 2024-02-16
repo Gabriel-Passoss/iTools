@@ -12,8 +12,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -32,6 +34,7 @@ const loginSchema = z.object({
 export default function LoginPage() {
   const { toast } = useToast()
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -46,6 +49,7 @@ export default function LoginPage() {
     e?: React.BaseSyntheticEvent,
   ) {
     e?.preventDefault()
+    setIsLoading(true)
 
     const result = await signIn('credentials', {
       email,
@@ -63,6 +67,8 @@ export default function LoginPage() {
     if (result?.ok) {
       router.replace('/dashboard')
     }
+
+    setIsLoading(false)
   }
 
   return (
@@ -120,7 +126,7 @@ export default function LoginPage() {
           />
 
           <Button type="submit" className="mt-2 font-semibold">
-            Entrar
+            {isLoading ? <Loader2 className="animate-spin" /> : 'Entrar'}
           </Button>
         </form>
       </Form>
