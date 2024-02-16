@@ -1,5 +1,5 @@
-import { nextAuthOptions } from '@/app/api/auth/[...nextauth]/route'
-import { LogoutButton } from '@/components/logout-button'
+import { nextAuthOptions } from '@/utils/next-auth-options'
+import { ProfileButton } from '@/components/profile-button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
@@ -36,14 +36,7 @@ export default async function InAppLayout({
             </ul>
           </div>
           <div className="flex items-center gap-5">
-            <Avatar>
-              <AvatarImage
-                src="https://github.com/Gabriel-Passoss.png"
-                alt="@shadcn"
-              />
-              <AvatarFallback>Avatar</AvatarFallback>
-            </Avatar>
-            <LogoutButton />
+            <ProfileButton userSession={session.user} />
           </div>
         </nav>
       </header>
