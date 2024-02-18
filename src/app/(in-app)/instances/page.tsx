@@ -53,6 +53,7 @@ const createInstanceSchema = z.object({
         .replaceAll(' ', ''),
     ),
   heat: z.boolean(),
+  chatwoot: z.boolean(),
 })
 
 const digitsOnlyMask: MaskitoOptions = {
@@ -96,8 +97,9 @@ export default function InstancesPage() {
     resolver: zodResolver(createInstanceSchema),
     defaultValues: {
       name: '',
-      phone: '55',
+      phone: '',
       heat: true,
+      chatwoot: true,
     },
   })
 
@@ -116,33 +118,64 @@ export default function InstancesPage() {
   }
 
   async function handleCreateInstance(
-    { name, phone, heat }: z.infer<typeof createInstanceSchema>,
+    { name, phone, heat, chatwoot }: z.infer<typeof createInstanceSchema>,
     e?: React.BaseSyntheticEvent,
   ) {
     e?.preventDefault()
     setIsLoading(true)
+    if (chatwoot === false) {
+      await api
+        .post<CreateInstanceResponse>('/instances', { name, phone, heat })
+        .then((response) => {
+          setQrCode(response.data.base64)
+          mutate('instances')
+        })
+        .catch((error) => {
+          if (error instanceof AxiosError) {
+            if (error.response?.status === 201) {
+              toast({ title: 'Instância criada com sucesso!' })
+            }
 
-    await api
-      .post<CreateInstanceResponse>('/instances', { name, phone, heat })
-      .then((response) => {
-        setQrCode(response.data.base64)
-        mutate('instances')
-      })
-      .catch((error) => {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 201) {
-            toast({ title: 'Instância criada com sucesso!' })
+            if (error.response?.status === 409) {
+              setIsCreateDialogOpen(false)
+              toast({
+                title: `Instancia com o mesmo nome ou telefone já existe`,
+                variant: 'destructive',
+              })
+            }
           }
+        })
+    } else {
+      console.log(process.env.CHATWOOT_URL)
+      await api
+        .post<CreateInstanceResponse>('/instances/chatwoot', {
+          name,
+          phone,
+          heat,
+          chatwootUrl: process.env.NEXT_PUBLIC_CHATWOOT_URL,
+          chatwootAccountId: process.env.NEXT_PUBLIC_CHATWOOT_ACCOUNT_ID,
+          chatwootAccountToken: process.env.NEXT_PUBLIC_CHATWOOT_ACCOUNT_TOKEN,
+        })
+        .then((response) => {
+          setQrCode(response.data.base64)
+          mutate('instances')
+        })
+        .catch((error) => {
+          if (error instanceof AxiosError) {
+            if (error.response?.status === 201) {
+              toast({ title: 'Instância criada com sucesso!' })
+            }
 
-          if (error.response?.status === 409) {
-            setIsCreateDialogOpen(false)
-            toast({
-              title: `Instancia com o mesmo nome ou telefone já existe`,
-              variant: 'destructive',
-            })
+            if (error.response?.status === 409) {
+              setIsCreateDialogOpen(false)
+              toast({
+                title: `Instancia com o mesmo nome ou telefone já existe`,
+                variant: 'destructive',
+              })
+            }
           }
-        }
-      })
+        })
+    }
 
     setIsLoading(false)
     form.reset()
@@ -265,6 +298,31 @@ export default function InstancesPage() {
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="chatwoot"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-slate-700 p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-slate-200">
+                            Chatwoot
+                          </FormLabel>
+                          <FormDescription className="text-slate-200">
+                            Conectar instância ao ChatWoot
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className="bg-green-500"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
                   <Button
                     type="submit"
                     className="bg-green-600 hover:bg-green-700 mt-5"
