@@ -71,6 +71,7 @@ const createInstanceSchema = z
 
     if (
       values.chatwootUrl !== undefined &&
+      values.chatwootUrl !== '' &&
       !values.chatwootUrl.startsWith('https://')
     ) {
       return refinementContext.addIssue({
