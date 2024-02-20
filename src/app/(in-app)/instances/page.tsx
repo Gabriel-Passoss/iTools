@@ -144,7 +144,7 @@ export default function InstancesPage() {
       name: '',
       phone: '',
       heat: true,
-      chatwoot: true,
+      chatwoot: false,
       chatwootUrl: '',
       chatwootAccountId: '',
       chatwootAccountToken: '',
