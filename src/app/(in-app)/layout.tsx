@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
+import { AlertTriangle } from 'lucide-react'
 
 export default async function InAppLayout({
   children,
@@ -19,6 +20,10 @@ export default async function InAppLayout({
 
   return (
     <div className="h-screen flex flex-col gap-5 bg-slate-950">
+      <div className="w-full p-1 bg-red-400 text-slate-200 flex justify-center items-center gap-2">
+        <AlertTriangle />
+        <p>Produto em fase de testes!</p>
+      </div>
       <header>
         <nav className="flex justify-between items-center h-[6vh] border-b-[1px] border-slate-800 p-5">
           <div className="flex items-center gap-3">
