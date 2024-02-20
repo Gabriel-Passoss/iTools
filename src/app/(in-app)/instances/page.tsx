@@ -39,23 +39,65 @@ import type { MaskitoOptions } from '@maskito/core'
 import { useMaskito } from '@maskito/react'
 import { useSession } from 'next-auth/react'
 
-const createInstanceSchema = z.object({
-  name: z.string(),
-  phone: z
-    .string()
-    .min(19)
-    .max(19)
-    .transform((value) =>
-      value
-        .replaceAll('+', '')
-        .replaceAll('(', '')
-        .replaceAll(')', '')
-        .replaceAll('-', '')
-        .replaceAll(' ', ''),
-    ),
-  heat: z.boolean(),
-  chatwoot: z.boolean(),
-})
+const createInstanceSchema = z
+  .object({
+    name: z.string(),
+    phone: z
+      .string()
+      .min(19)
+      .max(19)
+      .transform((value) =>
+        value
+          .replaceAll('+', '')
+          .replaceAll('(', '')
+          .replaceAll(')', '')
+          .replaceAll('-', '')
+          .replaceAll(' ', ''),
+      ),
+    heat: z.boolean(),
+    chatwoot: z.boolean(),
+    chatwootUrl: z.string().optional(),
+    chatwootAccountId: z.string().optional(),
+    chatwootAccountToken: z.string().optional(),
+  })
+  .superRefine((values, refinementContext) => {
+    if (values.chatwoot === true && values.chatwootUrl === '') {
+      return refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Campo de URL não preenchido',
+        path: ['chatwootUrl'],
+      })
+    }
+
+    if (
+      values.chatwootUrl !== undefined &&
+      !values.chatwootUrl.startsWith('https://')
+    ) {
+      return refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Campo de URL inválido',
+        path: ['chatwootUrl'],
+      })
+    }
+
+    if (values.chatwoot === true && values.chatwootAccountId === '') {
+      return refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Campo de ID não preenchido',
+        path: ['chatwootId'],
+      })
+    }
+
+    if (values.chatwoot === true && values.chatwootAccountToken === '') {
+      return refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Campo de token da conta não preenchido',
+        path: ['chatwootAccountToken'],
+      })
+    }
+
+    return values
+  })
 
 const digitsOnlyMask: MaskitoOptions = {
   mask: [
@@ -102,6 +144,9 @@ export default function InstancesPage() {
       phone: '',
       heat: true,
       chatwoot: true,
+      chatwootUrl: '',
+      chatwootAccountId: '',
+      chatwootAccountToken: '',
     },
   })
 
@@ -120,7 +165,15 @@ export default function InstancesPage() {
   }
 
   async function handleCreateInstance(
-    { name, phone, heat, chatwoot }: z.infer<typeof createInstanceSchema>,
+    {
+      name,
+      phone,
+      heat,
+      chatwoot,
+      chatwootUrl,
+      chatwootAccountId,
+      chatwootAccountToken,
+    }: z.infer<typeof createInstanceSchema>,
     e?: React.BaseSyntheticEvent,
   ) {
     e?.preventDefault()
@@ -153,15 +206,15 @@ export default function InstancesPage() {
           }
         })
     } else {
-      console.log(process.env.CHATWOOT_URL)
       await api
         .post<CreateInstanceResponse>('/instances/chatwoot', {
+          organizationId: session?.user.organizationId,
           name,
           phone,
           heat,
-          chatwootUrl: process.env.NEXT_PUBLIC_CHATWOOT_URL,
-          chatwootAccountId: process.env.NEXT_PUBLIC_CHATWOOT_ACCOUNT_ID,
-          chatwootAccountToken: process.env.NEXT_PUBLIC_CHATWOOT_ACCOUNT_TOKEN,
+          chatwootUrl,
+          chatwootAccountId,
+          chatwootAccountToken,
         })
         .then((response) => {
           setQrCode(response.data.base64)
@@ -172,7 +225,6 @@ export default function InstancesPage() {
             if (error.response?.status === 201) {
               toast({ title: 'Instância criada com sucesso!' })
             }
-
             if (error.response?.status === 409) {
               setIsCreateDialogOpen(false)
               toast({
@@ -225,6 +277,7 @@ export default function InstancesPage() {
                   onClick={() => {
                     setIsCreateDialogOpen(false)
                     setQrCode(null)
+                    mutate('instances')
                   }}
                 >
                   Já escaniei
@@ -329,6 +382,75 @@ export default function InstancesPage() {
                       </FormItem>
                     )}
                   />
+
+                  {form.getValues().chatwoot ? (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="chatwootUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-100 font-medium">
+                              Url do chatwoot
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Insira o url"
+                                className="bg-slate-700 text-slate-100"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="chatwootAccountId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-100 font-medium">
+                              ID do chatwoot
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Insira o id"
+                                className="bg-slate-700 text-slate-100"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="chatwootAccountToken"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-100 font-medium">
+                              Token da conta
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Insira o token da conta"
+                                className="bg-slate-700 text-slate-100"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  ) : (
+                    <></>
+                  )}
 
                   <Button
                     type="submit"
