@@ -20,6 +20,7 @@ import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 
 const registerSchema = z.object({
+  organizationName: z.string(),
   name: z.string(),
   email: z.string().email({ message: 'Dado inválido, insira um e-mail' }),
   password: z
@@ -38,6 +39,7 @@ export default function RegisterPage() {
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      organizationName: '',
       name: '',
       email: '',
       password: '',
@@ -47,7 +49,7 @@ export default function RegisterPage() {
   const { toast } = useToast()
 
   async function onSubmit(
-    { name, email, password }: z.infer<typeof registerSchema>,
+    { organizationName, name, email, password }: z.infer<typeof registerSchema>,
     e?: React.BaseSyntheticEvent,
   ) {
     e?.preventDefault()
@@ -55,7 +57,7 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     api
-      .post('/accounts', { name, email, password })
+      .post('/accounts', { organizationName, name, email, password })
       .then(() => {
         setIsLoading(false)
         toast({
@@ -90,6 +92,27 @@ export default function RegisterPage() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-3 mt-5 w-[70vw] md:w-[25vw]"
         >
+          <FormField
+            control={form.control}
+            name="organizationName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-slate-100 font-medium">
+                  Nome da organização
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="Nome completo da organização"
+                    className="bg-slate-700 text-slate-100"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="name"
