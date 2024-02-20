@@ -154,7 +154,11 @@ export function ProfileButton({ userSession }: ProfileButtonProps) {
         <DropdownMenuTrigger asChild>
           <Avatar>
             <AvatarImage
-              src="https://github.com/Gabriel-Passoss.png"
+              src={
+                userSession.profileImageUrl
+                  ? userSession.profileImageUrl
+                  : 'https://storage.igamingoperacao.com/instance-heating/boy.png'
+              }
               alt="@shadcn"
               className="h-10 w-10 rounded-full cursor-pointer"
             />
@@ -201,7 +205,11 @@ export function ProfileButton({ userSession }: ProfileButtonProps) {
           <div className="flex flex-col items-center p-2">
             <Avatar>
               <AvatarImage
-                src="https://github.com/Gabriel-Passoss.png"
+                src={
+                  userSession.profileImageUrl
+                    ? userSession.profileImageUrl
+                    : 'https://storage.igamingoperacao.com/instance-heating/boy.png'
+                }
                 alt="@shadcn"
                 className="h-14 w-14 rounded-full cursor-pointer"
               />
@@ -332,7 +340,11 @@ export function ProfileButton({ userSession }: ProfileButtonProps) {
                   <TableCell className="text-slate-200 text-nowrap flex items-center gap-2">
                     <Avatar>
                       <AvatarImage
-                        src="https://github.com/Gabriel-Passoss.png"
+                        src={
+                          userSession.profileImageUrl
+                            ? userSession.profileImageUrl
+                            : 'https://storage.igamingoperacao.com/instance-heating/boy.png'
+                        }
                         className="h-7 w-7 rounded-full cursor-pointer"
                       />
                       <AvatarFallback>Avatar</AvatarFallback>
