@@ -8,6 +8,7 @@ declare module 'next-auth' {
       email: string
       profileImageUrl: string
       role: 'ADMIN' | 'USER'
+      organizationId: string
       createdAt: Date
       updatedAt: Date
       token: string
