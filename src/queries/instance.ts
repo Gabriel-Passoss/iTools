@@ -40,14 +40,14 @@ export interface CreateInstanceResponse {
   base64: string
 }
 
-async function getInstances() {
-  const { data } = await api.get<FetchInstancesResponse>('/instances')
+export function useFetchInstances(organizationId: string | undefined) {
+  return useSwr('instances', async () => {
+    const { data } = await api.get<FetchInstancesResponse>(
+      `/instances/organization/${organizationId}`,
+    )
 
-  return data
-}
-
-export function useFetchInstances() {
-  return useSwr('instances', getInstances)
+    return data
+  })
 }
 
 export async function deleteInstance(name: string) {

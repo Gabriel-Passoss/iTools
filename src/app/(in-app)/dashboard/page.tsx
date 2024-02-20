@@ -5,9 +5,12 @@ import { PizzaCart } from '@/components/pizza-cart'
 
 import { Instance, InstanceHeat, useFetchInstances } from '@/queries/instance'
 import { Ban, Check, Flame, Send } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 
 export default function DashboardPage() {
-  const { data } = useFetchInstances()
+  const { data: session } = useSession()
+  const { data } = useFetchInstances(session?.user.organizationId)
+  console.log(session?.user)
 
   return (
     <section className="p-14 flex flex-col gap-5">

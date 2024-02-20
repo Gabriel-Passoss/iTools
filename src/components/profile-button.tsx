@@ -73,7 +73,7 @@ const loginSchema = z.object({
 })
 
 export function ProfileButton({ userSession }: ProfileButtonProps) {
-  const { data } = useFetchUsers()
+  const { data } = useFetchUsers(userSession.organizationId)
   const { toast } = useToast()
   const { mutate } = useSWRConfig()
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)

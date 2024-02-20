@@ -24,14 +24,14 @@ interface EditUserRequestProps {
   passwordConfirmation: string
 }
 
-async function getUsers() {
-  const { data } = await api.get<FetchUsersResponse>('/accounts')
+export function useFetchUsers(organizationId: string) {
+  return useSwr('users', async () => {
+    const { data } = await api.get<FetchUsersResponse>(
+      `/accounts/organization/${organizationId}`,
+    )
 
-  return data
-}
-
-export function useFetchUsers() {
-  return useSwr('users', getUsers)
+    return data
+  })
 }
 
 export async function activeUser(userId: string) {

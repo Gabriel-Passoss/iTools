@@ -37,6 +37,7 @@ import { api } from '@/lib/axios'
 import { AxiosError } from 'axios'
 import type { MaskitoOptions } from '@maskito/core'
 import { useMaskito } from '@maskito/react'
+import { useSession } from 'next-auth/react'
 
 const createInstanceSchema = z.object({
   name: z.string(),
@@ -81,7 +82,8 @@ const digitsOnlyMask: MaskitoOptions = {
 }
 
 export default function InstancesPage() {
-  const { data } = useFetchInstances()
+  const { data: session } = useSession()
+  const { data } = useFetchInstances(session?.user.organizationId)
   const { mutate } = useSWRConfig()
   const { toast } = useToast()
   const [instances, setInstances] = useState<Instance[] | undefined>([])
@@ -125,7 +127,12 @@ export default function InstancesPage() {
     setIsLoading(true)
     if (chatwoot === false) {
       await api
-        .post<CreateInstanceResponse>('/instances', { name, phone, heat })
+        .post<CreateInstanceResponse>('/instances', {
+          name,
+          phone,
+          heat,
+          organizationId: session?.user.organizationId,
+        })
         .then((response) => {
           setQrCode(response.data.base64)
           mutate('instances')
