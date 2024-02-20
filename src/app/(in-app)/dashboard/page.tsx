@@ -73,13 +73,13 @@ export default function DashboardPage() {
           </span>
         </div>
 
-        <div className="w-[17vw] h-[11vh] border-[1px] border-slate-800 rounded-md py-3 px-5 flex flex-col justify-center gap-2">
+        {/* <div className="w-[17vw] h-[11vh] border-[1px] border-slate-800 rounded-md py-3 px-5 flex flex-col justify-center gap-2">
           <h2 className="text-slate-200 flex justify-between items-center">
             Mensagens enviadas
             <Send size={16} />
           </h2>
           <span className="text-slate-200 font-bold text-2xl">1423</span>
-        </div>
+        </div> */}
       </div>
 
       <div className="grid grid-flow-row-dense grid-cols-3 gap-5">
