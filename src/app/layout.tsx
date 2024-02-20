@@ -7,7 +7,7 @@ import { NextAuthSessionProvider } from '@/providers/session-provider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Igaming Operação',
+  title: 'Heaty',
 }
 
 export default function RootLayout({
