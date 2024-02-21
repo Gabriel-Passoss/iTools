@@ -15,7 +15,8 @@ export default function InstancesPage() {
   const { mutate } = useSWRConfig()
   const { toast } = useToast()
   const [instances, setInstances] = useState<Instance[] | undefined>([])
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isInstanceOptionsDialogOpen, setIsInstanceOptionsDialogOpen] =
+    useState(false)
 
   const [filter, setFilter] = useState('')
 
@@ -55,8 +56,8 @@ export default function InstancesPage() {
         <InstancesTable
           instances={filterInstances}
           handleDeleteInstance={handleDeleteInstance}
-          isDeleteDialogOpen={isDeleteDialogOpen}
-          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isInstanceOptionsDialogOpen={isInstanceOptionsDialogOpen}
+          setIsInstanceOptionsDialogOpen={setIsInstanceOptionsDialogOpen}
         />
       </div>
     </section>
