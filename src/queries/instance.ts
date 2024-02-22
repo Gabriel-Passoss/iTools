@@ -28,6 +28,7 @@ export interface Instance {
   phone: string
   status: InstanceStatus
   heat: InstanceHeat
+  connectedToChatwoot: boolean
   used: boolean
   updatedAt: string
 }

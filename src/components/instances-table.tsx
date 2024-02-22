@@ -125,7 +125,7 @@ export function InstancesTable({
     },
   })
 
-  async function handleCreateInstance(
+  async function handleConnectInstanceToChatwoot(
     {
       instanceName,
       chatwootUrl,
@@ -170,6 +170,7 @@ export function InstancesTable({
           <TableHead>Status</TableHead>
           <TableHead>Número conectado</TableHead>
           <TableHead>Etapa de aquecimento</TableHead>
+          <TableHead>Conexão com Chatwoot</TableHead>
           <TableHead className="text-right">Ações</TableHead>
         </TableRow>
       </TableHeader>
@@ -184,6 +185,9 @@ export function InstancesTable({
               <TableCell>{formatStatus(instance.status)}</TableCell>
               <TableCell>{formatPhone(instance.phone)}</TableCell>
               <TableCell>{formatHeat(instance.heat)}</TableCell>
+              <TableCell>
+                {instance.connectedToChatwoot ? 'Conectado' : 'Desconectado'}
+              </TableCell>
               <TableCell className="text-right">
                 <Dialog
                   open={isInstanceOptionsDialogOpen}
@@ -205,15 +209,19 @@ export function InstancesTable({
                       >
                         Deletar
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setIsInstanceOptionsDialogOpen(true)
-                          setModalType('Chatwoot')
-                        }}
-                      >
-                        Conectar Chatwoot
-                      </DropdownMenuItem>
+                      {instance.connectedToChatwoot ? (
+                        <></>
+                      ) : (
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setIsInstanceOptionsDialogOpen(true)
+                            setModalType('Chatwoot')
+                          }}
+                        >
+                          Conectar Chatwoot
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                   {modalType === 'Delete' ? (
@@ -246,7 +254,9 @@ export function InstancesTable({
                       </DialogHeader>
                       <Form {...form}>
                         <form
-                          onSubmit={form.handleSubmit(handleCreateInstance)}
+                          onSubmit={form.handleSubmit(
+                            handleConnectInstanceToChatwoot,
+                          )}
                           className="flex flex-col gap-3 mt-5 w-[70vw] md:w-[25vw]"
                         >
                           <Input
