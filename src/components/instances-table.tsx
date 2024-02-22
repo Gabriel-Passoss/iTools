@@ -42,6 +42,7 @@ import { Input } from './ui/input'
 import { api } from '@/lib/axios'
 import { AxiosError } from 'axios'
 import { toast } from './ui/use-toast'
+import { mutate } from 'swr'
 
 interface InstancesTableProps {
   instances: Instance[] | undefined
@@ -134,10 +135,9 @@ export function InstancesTable({
     }: z.infer<typeof connectToChatwootSchema>,
     e?: React.BaseSyntheticEvent,
   ) {
-    console.log(instanceName)
-    e?.preventDefault()
     setIsLoading(true)
-    api
+    e?.preventDefault()
+    await api
       .post('/instances/chatwoot', {
         name: instanceName,
         chatwootUrl,
@@ -145,6 +145,7 @@ export function InstancesTable({
         chatwootAccountToken: chatwootToken,
       })
       .then(() => {
+        mutate('instances')
         setIsInstanceOptionsDialogOpen(false)
         toast({ title: 'Conexão efetuada com sucesso!' })
       })
