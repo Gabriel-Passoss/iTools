@@ -262,7 +262,7 @@ export function InstancesTable({
                           <Input
                             type="hidden"
                             {...form.register('instanceName')}
-                            defaultValue={instance.hashedName}
+                            defaultValue={instance.name}
                           />
 
                           <FormField
