@@ -24,9 +24,11 @@ export enum InstanceHeat {
 export interface Instance {
   id: string
   name: string
+  hashedName: string
   phone: string
   status: InstanceStatus
   heat: InstanceHeat
+  connectedToChatwoot: boolean
   used: boolean
   updatedAt: string
 }
