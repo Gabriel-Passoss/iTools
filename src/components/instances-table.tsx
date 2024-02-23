@@ -1,6 +1,6 @@
 import { Loader2, MoreVertical } from 'lucide-react'
 
-import { Instance } from '@/queries/instance'
+import { Instance, deleteInstance } from '@/queries/instance'
 import { useState } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -26,7 +26,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -48,7 +47,6 @@ interface InstancesTableProps {
   instances: Instance[] | undefined
   isInstanceOptionsDialogOpen: boolean
   setIsInstanceOptionsDialogOpen: (status: boolean) => void
-  handleDeleteInstance: (name: string) => void
 }
 
 function formatPhone(phone: string) {
@@ -112,9 +110,7 @@ export function InstancesTable({
   instances,
   isInstanceOptionsDialogOpen,
   setIsInstanceOptionsDialogOpen,
-  handleDeleteInstance,
 }: InstancesTableProps) {
-  const [modalType, setModalType] = useState<'Delete' | 'Chatwoot' | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof connectToChatwootSchema>>({
@@ -125,6 +121,16 @@ export function InstancesTable({
       chatwootToken: '',
     },
   })
+
+  async function handleDeleteInstance(name: string) {
+    const { status } = await deleteInstance(name)
+
+    mutate('instances')
+
+    if (status === 200) {
+      toast({ title: 'Instância deletada com sucesso!' })
+    }
+  }
 
   async function handleConnectInstanceToChatwoot(
     {
@@ -204,8 +210,7 @@ export function InstancesTable({
                       <DropdownMenuItem
                         className="cursor-pointer"
                         onClick={() => {
-                          setIsInstanceOptionsDialogOpen(true)
-                          setModalType('Delete')
+                          handleDeleteInstance(instance.name)
                         }}
                       >
                         Deletar
@@ -217,7 +222,6 @@ export function InstancesTable({
                           className="cursor-pointer"
                           onClick={() => {
                             setIsInstanceOptionsDialogOpen(true)
-                            setModalType('Chatwoot')
                           }}
                         >
                           Conectar Chatwoot
@@ -225,124 +229,101 @@ export function InstancesTable({
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  {modalType === 'Delete' ? (
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Você tem certeza?</DialogTitle>
-                        <DialogDescription>
-                          Essa ação não pode ser desfeita. Isso excluirá
-                          permanentemente sua instância e removerá seus dados de
-                          nossos servidores.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <Button
-                        variant="destructive"
-                        className="outline-none ring-offset-0 text-red-100"
-                        onClick={() => {
-                          handleDeleteInstance(instance.name)
-                          setIsInstanceOptionsDialogOpen(false)
-                        }}
+                  <DialogContent className="bg-slate-900 border-0 flex flex-col items-center">
+                    <DialogHeader>
+                      <DialogTitle className="text-slate-200 text-center">
+                        Conectar instância ao Chatwoot
+                      </DialogTitle>
+                    </DialogHeader>
+                    <Form {...form}>
+                      <form
+                        onSubmit={form.handleSubmit(
+                          handleConnectInstanceToChatwoot,
+                        )}
+                        className="flex flex-col gap-3 mt-5 w-[70vw] md:w-[25vw]"
                       >
-                        Tenho certeza
-                      </Button>
-                    </DialogContent>
-                  ) : (
-                    <DialogContent className="bg-slate-900 border-0 flex flex-col items-center">
-                      <DialogHeader>
-                        <DialogTitle className="text-slate-200 text-center">
-                          Conectar instância ao Chatwoot
-                        </DialogTitle>
-                      </DialogHeader>
-                      <Form {...form}>
-                        <form
-                          onSubmit={form.handleSubmit(
-                            handleConnectInstanceToChatwoot,
+                        <Input
+                          type="hidden"
+                          {...form.register('instanceName')}
+                          defaultValue={instance.name}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="chatwootUrl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-100 font-medium">
+                                Url do Chatwoot
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="Insira o url do chatwoot"
+                                  className="bg-slate-700 text-slate-100"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
                           )}
-                          className="flex flex-col gap-3 mt-5 w-[70vw] md:w-[25vw]"
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="chatwootAccountId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-100 font-medium">
+                                ID da conta Chatwoot
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="tel"
+                                  placeholder="Insira o ID da conta Chatwoot"
+                                  className="bg-slate-700 text-slate-100"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="chatwootToken"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-100 font-medium">
+                                Token da conta Chatwoot
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="tel"
+                                  placeholder="Insira o token da conta Chatwoot"
+                                  className="bg-slate-700 text-slate-100"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <Button
+                          type="submit"
+                          className="bg-green-600 hover:bg-green-700 mt-5"
                         >
-                          <Input
-                            type="hidden"
-                            {...form.register('instanceName')}
-                            defaultValue={instance.name}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name="chatwootUrl"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-100 font-medium">
-                                  Url do Chatwoot
-                                </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="text"
-                                    placeholder="Insira o url do chatwoot"
-                                    className="bg-slate-700 text-slate-100"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name="chatwootAccountId"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-100 font-medium">
-                                  ID da conta Chatwoot
-                                </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    type="tel"
-                                    placeholder="Insira o ID da conta Chatwoot"
-                                    className="bg-slate-700 text-slate-100"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name="chatwootToken"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-100 font-medium">
-                                  Token da conta Chatwoot
-                                </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    type="tel"
-                                    placeholder="Insira o token da conta Chatwoot"
-                                    className="bg-slate-700 text-slate-100"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <Button
-                            type="submit"
-                            className="bg-green-600 hover:bg-green-700 mt-5"
-                          >
-                            {isLoading ? (
-                              <Loader2 className="animate-spin" />
-                            ) : (
-                              <span>Conectar</span>
-                            )}
-                          </Button>
-                        </form>
-                      </Form>
-                    </DialogContent>
-                  )}
+                          {isLoading ? (
+                            <Loader2 className="animate-spin" />
+                          ) : (
+                            <span>Conectar</span>
+                          )}
+                        </Button>
+                      </form>
+                    </Form>
+                  </DialogContent>
                 </Dialog>
               </TableCell>
             </TableRow>
