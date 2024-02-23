@@ -19,7 +19,7 @@ export default async function InAppLayout({
   }
 
   return (
-    <div className="h-full flex flex-col gap-5 bg-slate-950">
+    <div className="h-full min-h-screen flex flex-col gap-5 bg-slate-950">
       <div className="w-full p-1 bg-red-400 text-slate-200 flex justify-center items-center gap-2">
         <AlertTriangle />
         <p>Produto em fase de testes!</p>
