@@ -1,19 +1,16 @@
 'use client'
 
-import { Input } from '@/components/ui/input'
-import { Instance, deleteInstance, useFetchInstances } from '@/queries/instance'
 import { useEffect, useState } from 'react'
-import { useToast } from '@/components/ui/use-toast'
-import { useSWRConfig } from 'swr'
-import { InstancesTable } from '@/components/instances-table'
 import { useSession } from 'next-auth/react'
+
+import { Input } from '@/components/ui/input'
+import { InstancesTable } from '@/components/instances-table'
 import { CreateInstanceButton } from '@/components/create-instance-button'
+import { Instance, useFetchInstances } from '@/queries/instance'
 
 export default function InstancesPage() {
   const { data: session } = useSession()
   const { data } = useFetchInstances(session?.user.organizationId)
-  const { mutate } = useSWRConfig()
-  const { toast } = useToast()
   const [instances, setInstances] = useState<Instance[] | undefined>([])
   const [isInstanceOptionsDialogOpen, setIsInstanceOptionsDialogOpen] =
     useState(false)
@@ -23,16 +20,6 @@ export default function InstancesPage() {
   useEffect(() => {
     setInstances(data?.instances)
   }, [data])
-
-  async function handleDeleteInstance(name: string) {
-    const { status } = await deleteInstance(name)
-
-    mutate('instances')
-
-    if (status === 200) {
-      toast({ title: 'Instância deletada com sucesso!' })
-    }
-  }
 
   const filterInstances = instances?.filter((instance) =>
     instance.name.toLowerCase().includes(filter.toLowerCase()),
@@ -52,10 +39,9 @@ export default function InstancesPage() {
         <CreateInstanceButton session={session} />
       </div>
 
-      <div className="px-14">
+      <div className="px-14 flex flex-col gap-5">
         <InstancesTable
           instances={filterInstances}
-          handleDeleteInstance={handleDeleteInstance}
           isInstanceOptionsDialogOpen={isInstanceOptionsDialogOpen}
           setIsInstanceOptionsDialogOpen={setIsInstanceOptionsDialogOpen}
         />
