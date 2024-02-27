@@ -9,6 +9,9 @@
     "lint": "next lint --fix"
   },
   "dependencies": {
+    "@clerk/localizations": "^1.26.15",
+    "@clerk/nextjs": "^4.29.7",
+    "@clerk/themes": "^1.7.9",
     "@hookform/resolvers": "^3.3.4",
     "@maskito/core": "^2.0.2",
     "@maskito/react": "^2.0.2",

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
 
 import { Input } from '@/components/ui/input'
 import { InstancesTable } from '@/components/instances-table'
@@ -9,17 +8,16 @@ import { CreateInstanceButton } from '@/components/create-instance-button'
 import { Instance, useFetchInstances } from '@/queries/instance'
 
 export default function InstancesPage() {
-  const { data: session } = useSession()
-  const { data } = useFetchInstances(session?.user.organizationId)
+  // const { data } = useFetchInstances(session?.user.organizationId)
   const [instances, setInstances] = useState<Instance[] | undefined>([])
   const [isInstanceOptionsDialogOpen, setIsInstanceOptionsDialogOpen] =
     useState(false)
 
   const [filter, setFilter] = useState('')
 
-  useEffect(() => {
-    setInstances(data?.instances)
-  }, [data])
+  // useEffect(() => {
+  //   setInstances(data?.instances)
+  // }, [data])
 
   const filterInstances = instances?.filter((instance) =>
     instance.name.toLowerCase().includes(filter.toLowerCase()),
@@ -36,7 +34,7 @@ export default function InstancesPage() {
           className="p-5 bg-slate-700 text-slate-100"
           onChange={(event) => setFilter(event.target.value)}
         />
-        <CreateInstanceButton session={session} />
+        {/* <CreateInstanceButton session={session} /> */}
       </div>
 
       <div className="px-14 flex flex-col gap-5">
