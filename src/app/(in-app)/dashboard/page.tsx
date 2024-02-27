@@ -3,14 +3,11 @@
 import { LineCart } from '@/components/line-cart'
 import { PizzaCart } from '@/components/pizza-cart'
 
-import { Instance, InstanceHeat, useFetchInstances } from '@/queries/instance'
-import { Ban, Check, Flame, Send } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { Instance, InstanceHeat } from '@/queries/instance'
+import { Ban, Check, Flame } from 'lucide-react'
 
 export default function DashboardPage() {
-  const { data: session } = useSession()
-  const { data } = useFetchInstances(session?.user.organizationId)
-  console.log(session?.user)
+  // const { data } = useFetchInstances(session?.user.organizationId)
 
   return (
     <section className="p-14 flex flex-col gap-5">
@@ -22,11 +19,11 @@ export default function DashboardPage() {
             <Check size={16} />
           </h2>
           <span className="text-slate-200 font-bold text-2xl">
-            {
+            {/* {
               data?.instances.filter(
                 (instance: Instance) => instance.status === 'OPEN',
               ).length
-            }
+            } */}
           </span>
         </div>
 
@@ -36,11 +33,11 @@ export default function DashboardPage() {
             <Ban size={16} />
           </h2>
           <span className="text-slate-200 font-bold text-2xl">
-            {
+            {/* {
               data?.instances.filter(
                 (instance: Instance) => instance.status === 'CLOSE',
               ).length
-            }
+            } */}
           </span>
         </div>
 
@@ -50,12 +47,12 @@ export default function DashboardPage() {
             <Flame size={16} />
           </h2>
           <span className="text-slate-200 font-bold text-2xl">
-            {
+            {/* {
               data?.instances.filter(
                 (instance: Instance) =>
                   instance.heat !== InstanceHeat.FALSE && InstanceHeat.TRUE,
               ).length
-            }
+            } */}
           </span>
         </div>
 
@@ -65,11 +62,11 @@ export default function DashboardPage() {
             <Flame size={16} />
           </h2>
           <span className="text-slate-200 font-bold text-2xl">
-            {
+            {/* {
               data?.instances.filter(
                 (instance: Instance) => instance.heat === InstanceHeat.TRUE,
               ).length
-            }
+            } */}
           </span>
         </div>
 
